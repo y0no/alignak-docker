@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  core:
+    build: ./docker_core
+    image: y0no/alignak
+    volumes:
+      - ./data/data:/usr/local/etc/alignak/
+      - ./data/log:/usr/local/var/log/alignak
+    ports:
+      - 7768:7768
+      - 5000:5000
+    links:
+      - db
+  db:
+    image: mongo
+    volumes:
+      - ./data/db:/data/db
+  webui:
+    build: ./docker_webui
+    image: y0no/alignak-webui
+    ports:
+      - 5001:5001
+    links:
+      - core
+    labels:
+      - traefik.frontend.rule=Host:monitoring.synhack.intra
+
+networks: 
+  default:
+    external:
+      name: main
